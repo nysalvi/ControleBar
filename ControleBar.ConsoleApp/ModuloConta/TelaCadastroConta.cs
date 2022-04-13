@@ -96,10 +96,26 @@ namespace ControleBar.ConsoleApp.ModuloConta
         {
             int total_pedidos = Convert.ToInt32(Console.ReadLine());
     
-            List<Pedido> pedidos = new List<Pedido>();
+            Pedido pedidos = new Pedido();
+
             for (int i = 0; i < total_pedidos; i++)
             {
-                
+                telaCadastroProduto.VisualizarRegistros("Tela");
+                int id = Convert.ToInt32(Console.ReadLine());
+                Produto p = repositorioProduto.SelecionarRegistro(x => x.id == id);
+                if (p == null)
+                {
+                    Console.WriteLine("Produto não encontrado!!!");
+                    i--;
+                    continue;
+                }
+                if (!p.Disponivel)
+                {
+                    Console.WriteLine("Produto indisponivel");
+                    i--;
+                    continue;
+                }
+                pedidos.Add(p);
             }
         }
 

@@ -94,7 +94,7 @@ namespace ControleBar.ConsoleApp.ModuloProduto
             return true;
         }
 
-        private Produto ObterProduto()
+        public Produto ObterProduto()
         {
             Console.Write("Digite o nome do produto: ");
             string nome = Console.ReadLine();
