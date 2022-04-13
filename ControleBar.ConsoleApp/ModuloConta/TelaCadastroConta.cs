@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using ControleBar.ConsoleApp.Compartilhado;
 
 using ControleBar.ConsoleApp.ModuloGarcom;
-using ControleBar.ConsoleApp.ModuloConta;
 using ControleBar.ConsoleApp.ModuloMesa;
+using ControleBar.ConsoleApp.ModuloPedido;
 using ControleBar.ConsoleApp.ModuloProduto;
-
 namespace ControleBar.ConsoleApp.ModuloConta
 {
     internal class TelaCadastroConta : TelaBase
@@ -19,6 +18,10 @@ namespace ControleBar.ConsoleApp.ModuloConta
 
         private readonly IRepositorio<Mesa> repositorioMesa;
         private readonly TelaCadastroMesa telaCadastroMesa;
+
+
+        private readonly IRepositorio<Produto> repositorioProduto;
+        private readonly TelaCadastroProduto telaCadastroProduto;
 
         public TelaCadastroConta(IRepositorio<Conta> repositorioConta, IRepositorio<Garcom> repositorioGarcom, TelaCadastroGarcom telaCadastroGarcom,
             IRepositorio<Mesa> repositorioMesa, TelaCadastroMesa telaCadastroMesa, Notificador notificador) 
@@ -89,9 +92,15 @@ namespace ControleBar.ConsoleApp.ModuloConta
             return true;
         }
 
-        internal void AdicionarPedidos()
+        public void AdicionarPedidos()
         {
-            throw new NotImplementedException();
+            int total_pedidos = Convert.ToInt32(Console.ReadLine());
+    
+            List<Pedido> pedidos = new List<Pedido>();
+            for (int i = 0; i < total_pedidos; i++)
+            {
+                
+            }
         }
 
         private Conta ObterConta()
@@ -118,14 +127,20 @@ namespace ControleBar.ConsoleApp.ModuloConta
 
             Console.WriteLine("Digite o dia: ");
             DateTime dia = DateTime.Parse(Console.ReadLine());
+
             Console.WriteLine("Lista de Garçons ---------------------");
             if (!telaCadastroGarcom.VisualizarRegistros("Tela"))
-                return;
+                return false;
 
             Console.WriteLine("Digite a id do garçom desejado: ");
             int idGarcom = Convert.ToInt32(Console.ReadLine());
-            Garcom garcom = repositorioGarcom.SelecionarRegistro();
-            List<Conta> contas = repositorioConta.Filtrar(x => !x.EmAberto);
+            Garcom garcom = repositorioGarcom.SelecionarRegistro(idGarcom);
+            if (garcom == null)
+            {
+                _notificador.ApresentarMensagem("Garçom não encontrado", TipoMensagem.Atencao);
+                return false;
+            }
+            List<Conta> contas = repositorioConta.Filtrar(x => !x.EmAberto && x.Dia == dia && x.Garcom == garcom);
 
             if (contas.Count == 0)
             {
@@ -136,9 +151,9 @@ namespace ControleBar.ConsoleApp.ModuloConta
 
             contas.ForEach(x =>
             {
-                soma += x.TotalPedidos * 1 / x.GorjetaPorcentagem;
+                soma += x.TotalPedidos * x.GorjetaPorcentagem * 0.01m;
             });
-            Console.WriteLine("O total do Lucro Faturado em {0} é de: {1}", dia, soma);
+            Console.WriteLine("O total do Lucro Faturado em Gorjetas Pelo Garçom {0} é de: R$ {1}", garcom.Nome, soma);
 
             Console.ReadLine();
 
